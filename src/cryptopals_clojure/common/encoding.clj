@@ -1,24 +1,27 @@
-(ns cryptopals-clojure.common.encoding)
+(ns cryptopals-clojure.common.encoding
+    (:import (org.apache.commons.codec.binary Hex)))
 
 (import java.util.Base64)
-(import java.math.BigInteger)
 
 (defn str2bytes [s] (.getBytes s))
 
-(defn bytes2str [b] (apply str (map char b)))
+(defn bytes2str [b] (apply str (map unchecked-char b)))
 
 (defn hex2bytes [hex]
-  (byte-array
-   (map
-    (fn [[x y]] (byte (Integer/parseInt (str x y) 16)))
-    (partition 2 hex))))
-
+  (Hex/decodeHex (.toCharArray hex)))
 
 (defn bytes2hex [b]
-  (format "%x" (new java.math.BigInteger b)))
+  (Hex/encodeHexString b))
 
 (defn bytes2b64 [to-encode]
   (.encodeToString (Base64/getEncoder)  to-encode))
 
 (defn b642bytes [to-decode]
   (.decode (Base64/getDecoder) to-decode))
+
+(comment
+  (bytes2hex (hex2bytes "4f"))
+  (bytes2str (str2bytes "foo"))
+  (bytes2b64 (b642bytes "foo="))
+
+  :rcf)
